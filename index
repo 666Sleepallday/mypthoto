@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高天乐 - 数据科学与大数据技术 - 个人可视化简历</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts-wordcloud@2.1.0/dist/echarts-wordcloud.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --primary: #1a73e8;
+    --primary-dark: #1557b0;
+    --bg: #f0f4f8;
+    --card-bg: #ffffff;
+    --text: #2d3748;
+    --text-light: #718096;
+    --border: #e2e8f0;
+    --accent-1: #667eea;
+    --accent-2: #764ba2;
+    --accent-3: #f093fb;
+    --accent-4: #4facfe;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    background: linear-gradient(135deg, #e8edf5 0%, #f0f4f8 30%, #e0e7f0 60%, #f5f0fa 100%);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ===== HEADER / HERO ===== */
+  .hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+    color: #fff;
+    padding: 50px 40px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle at 30% 40%, rgba(102,126,234,0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(79,172,254,0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(240,147,251,0.08) 0%, transparent 50%);
+    animation: float 15s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0); }
+    33% { transform: translate(20px, -20px); }
+    66% { transform: translate(-15px, 15px); }
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-avatar {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 4px solid rgba(255,255,255,0.3);
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 48px;
+    color: #fff;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    position: relative;
+  }
+  .qr-badge {
+    position: absolute;
+    bottom: -8px; right: -8px;
+    width: 44px; height: 44px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 3px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .hero h1 { font-size: 2.6em; font-weight: 700; letter-spacing: 2px; margin-bottom: 4px; }
+  .hero .subtitle {
+    font-size: 1.15em;
+    opacity: 0.85;
+    font-weight: 300;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+  .hero-tags {
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 16px;
+  }
+  .hero-tag {
+    padding: 6px 18px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 0.9em;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s;
+  }
+  .hero-tag:hover { background: rgba(255,255,255,0.22); transform: translateY(-2px); }
+  .hero-contact {
+    display: flex; gap: 28px; flex-wrap: wrap; justify-content: center; margin-top: 18px;
+    font-size: 0.95em; opacity: 0.8;
+  }
+  .hero-contact span { display: flex; align-items: center; gap: 6px; }
+
+  /* ===== MAIN LAYOUT ===== */
+  .container { max-width: 1200px; margin: 0 auto; padding: 30px 24px 50px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-full { grid-column: 1 / -1; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 28px 30px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--border);
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+  .card h3 {
+    font-size: 1.2em;
+    font-weight: 700;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--primary);
+    display: flex; align-items: center; gap: 10px;
+    color: var(--text);
+  }
+  .card h3 .icon { font-size: 1.4em; }
+  .chart-box { width: 100%; height: 380px; }
+
+  /* ===== SKILL BARS ===== */
+  .skill-row { margin-bottom: 14px; }
+  .skill-label { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 0.9em; font-weight: 500; }
+  .skill-bar-bg { height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; }
+  .skill-bar-fill {
+    height: 100%; border-radius: 5px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+  .skill-bar-fill.python { background: linear-gradient(90deg, #3776AB, #667eea); }
+  .skill-bar-fill.sql { background: linear-gradient(90deg, #f29111, #f55b47); }
+  .skill-bar-fill.spark { background: linear-gradient(90deg, #E25A1C, #f7a44c); }
+  .skill-bar-fill.viz { background: linear-gradient(90deg, #4facfe, #00f2fe); }
+  .skill-bar-fill.ml { background: linear-gradient(90deg, #f093fb, #667eea); }
+
+  /* ===== TIMELINE ===== */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 8px; top: 0; bottom: 0;
+    width: 3px; background: linear-gradient(180deg, #667eea, #764ba2, #f093fb);
+    border-radius: 2px;
+  }
+  .tl-item { position: relative; margin-bottom: 24px; }
+  .tl-item::before {
+    content: ''; position: absolute; left: -24px; top: 6px;
+    width: 13px; height: 13px;
+    background: var(--primary); border-radius: 50%;
+    border: 3px solid #fff; box-shadow: 0 0 0 3px var(--primary);
+  }
+  .tl-item.edu::before { background: #667eea; box-shadow: 0 0 0 3px #667eea; }
+  .tl-item.project::before { background: #f29111; box-shadow: 0 0 0 3px #f29111; }
+  .tl-date { font-size: 0.85em; color: var(--primary); font-weight: 600; }
+  .tl-title { font-weight: 700; font-size: 1.05em; margin: 2px 0; }
+  .tl-desc { font-size: 0.9em; color: var(--text-light); line-height: 1.7; }
+  .tl-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .tl-tag {
+    font-size: 0.78em; padding: 2px 10px;
+    background: #edf2f7; color: #4a5568; border-radius: 10px;
+  }
+
+  /* ===== CERT / EVAL ===== */
+  .cert-list { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; }
+  .cert-list li {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #f5f7fa, #edf2f7);
+    border-radius: 8px;
+    font-size: 0.9em;
+    font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+    border-left: 4px solid var(--primary);
+  }
+  .eval-text { font-size: 0.95em; line-height: 2; color: var(--text); }
+
+  /* ===== WORD CLOUD SECTION ===== */
+  .wordcloud-box { width: 100%; height: 300px; }
+
+  /* ===== POSTER SECTION ===== */
+  .poster-section {
+    text-align: center; padding: 40px 30px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: #fff;
+    border-radius: var(--radius);
+    margin-top: 24px;
+  }
+  .poster-section h3 { color: #fff; border-bottom-color: rgba(255,255,255,0.3); text-align: center; justify-content: center; }
+  .qr-container {
+    display: inline-block;
+    background: #fff; padding: 16px; border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    margin: 20px auto;
+  }
+  .qr-container canvas { display: block; }
+  .poster-hint { font-size: 0.9em; opacity: 0.7; margin-top: 12px; }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    text-align: center; padding: 30px;
+    color: var(--text-light); font-size: 0.85em;
+  }
+
+  /* ===== PRINT STYLES ===== */
+  @media print {
+    body { background: #fff; }
+    .hero { padding: 30px 20px 40px; }
+    .card { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO HEADER ===== -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-avatar" style="position:relative;">
+      👨‍💻
+      <div class="qr-badge" id="heroQr"></div>
+    </div>
+    <h1>高 天 乐</h1>
+    <p class="subtitle">数据科学与大数据技术 · 本科在读 · 2027届</p>
+    <div class="hero-contact">
+      <span>📞 18357196148</span>
+      <span>📧 2303311702@qq.com</span>
+      <span>🏫 浙江树人学院</span>
+      <span>🎂 2004.09</span>
+    </div>
+    <div class="hero-tags">
+      <span class="hero-tag">🐍 Python</span>
+      <span class="hero-tag">📊 数据可视化</span>
+      <span class="hero-tag">🤖 机器学习</span>
+      <span class="hero-tag">💾 大数据处理</span>
+      <span class="hero-tag">📈 数据分析</span>
+      <span class="hero-tag">🏗️ 后端开发</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="container">
+
+  <!-- Row 1: Skill Radar + Skill Bars -->
+  <div class="grid">
+    <!-- 技能雷达图 -->
+    <div class="card">
+      <h3><span class="icon">🎯</span> 技能雷达图</h3>
+      <div class="chart-box" id="radarChart"></div>
+    </div>
+    <!-- 技能熟练度 -->
+    <div class="card">
+      <h3><span class="icon">📊</span> 技能熟练度</h3>
+      <div style="padding-top: 10px;">
+        <div class="skill-row">
+          <div class="skill-label"><span>Python 数据分析</span><span>90%</span></div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill python" style="width:90%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-label"><span>SQL / 数据库</span><span>85%</span></div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill sql" style="width:85%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-label"><span>Hadoop / Spark</span><span>70%</span></div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill spark" style="width:70%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-label"><span>Tableau / ECharts 可视化</span><span>88%</span></div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill viz" style="width:88%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-label"><span>机器学习 / 数据挖掘</span><span>75%</span></div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill ml" style="width:75%"></div></div>
+        </div>
+        <div class="skill-row">
+          <div class="skill-label"><span>Java / Spring Boot</span><span>65%</span></div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:65%; background: linear-gradient(90deg, #43e97b, #38f9d7);"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Education Timeline + Project Experience -->
+  <div class="grid">
+    <!-- 教育背景 时间轴 -->
+    <div class="card">
+      <h3><span class="icon">🎓</span> 教育背景</h3>
+      <div class="timeline">
+        <div class="tl-item edu">
+          <div class="tl-date">2023.09 - 2027.06</div>
+          <div class="tl-title">浙江树人学院 · 数据科学与大数据技术</div>
+          <div class="tl-desc">本科 · 技术方向</div>
+          <div class="tl-tags">
+            <span class="tl-tag">Python程序设计</span>
+            <span class="tl-tag">数据结构与算法</span>
+            <span class="tl-tag">数据库原理</span>
+            <span class="tl-tag">Hadoop/Spark</span>
+            <span class="tl-tag">机器学习</span>
+            <span class="tl-tag">数据挖掘</span>
+            <span class="tl-tag">数据可视化</span>
+            <span class="tl-tag">统计学</span>
+            <span class="tl-tag">高等数学</span>
+            <span class="tl-tag">线性代数</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 项目经历 -->
+    <div class="card">
+      <h3><span class="icon">💼</span> 项目经历</h3>
+      <div class="timeline">
+        <div class="tl-item project">
+          <div class="tl-date">2024.03 - 2024.05</div>
+          <div class="tl-title">数据分析师 · 树人电商平台</div>
+          <div class="tl-desc">
+            • 基于<strong>Python</strong>对百万级用户日志进行清洗与特征工程<br>
+            • 构建<strong>RFM模型</strong>与用户分群体系，产出用户画像报告<br>
+            • 使用<strong>SQL</strong>多维度数据提取 + <strong>Tableau</strong>运营数据看板<br>
+            • 带领<strong>3人</strong>数据分析小组，制定标准化数据处理流程
+          </div>
+          <div class="tl-tags">
+            <span class="tl-tag">Python</span>
+            <span class="tl-tag">RFM模型</span>
+            <span class="tl-tag">SQL</span>
+            <span class="tl-tag">Tableau</span>
+            <span class="tl-tag">用户画像</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 3: ECharts 项目数据可视化 + 证书 -->
+  <div class="grid">
+    <!-- 项目数据可视化 -->
+    <div class="card">
+      <h3><span class="icon">📈</span> 项目数据可视化看板</h3>
+      <div class="chart-box" id="projectChart"></div>
+    </div>
+    <!-- 证书与技能分布 -->
+    <div class="card">
+      <h3><span class="icon">🏆</span> 证书与资质</h3>
+      <ul class="cert-list" style="margin-bottom:20px;">
+        <li>📜 CET-4 大学英语四级</li>
+        <li>💻 计算机二级证书</li>
+        <li>📊 数据分析师证书</li>
+      </ul>
+      <h3 style="margin-top:8px;"><span class="icon">📐</span> 课程成绩分布</h3>
+      <div class="chart-box" id="courseChart" style="height:300px;"></div>
+    </div>
+  </div>
+
+  <!-- Row 4: 词云 + 个人评价 -->
+  <div class="grid">
+    <!-- 技能词云 -->
+    <div class="card">
+      <h3><span class="icon">☁️</span> 技能词云</h3>
+      <div class="wordcloud-box" id="wordcloudChart"></div>
+    </div>
+    <!-- 个人评价 -->
+    <div class="card">
+      <h3><span class="icon">✨</span> 个人评价</h3>
+      <div class="eval-text">
+        <p>🎯 数据科学与大数据技术专业背景，具备<strong>扎实的统计学与高等数学基础</strong>。</p>
+        <p>🐍 熟练掌握<strong>Python数据分析与机器学习工具</strong>，具备独立完成数据挖掘与建模项目的能力。</p>
+        <p>🔍 具有较强的<strong>逻辑思维能力与数据敏感度</strong>，善于从海量数据中挖掘业务价值与趋势规律。</p>
+        <p>🤝 <strong>团队协作与沟通能力强</strong>，能与业务部门高效配合，推动数据驱动决策与业务增长。</p>
+        <p style="margin-top:12px; padding-top:12px; border-top:1px solid #e2e8f0;">
+          <strong>求职意向：</strong>Python后端开发 / 软件测试 / 数据分析师
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 5: Poster Section -->
+  <div class="poster-section grid-full">
+    <h3 style="border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 12px; margin-bottom: 20px;">
+      📱 个人二维码海报
+    </h3>
+    <p style="margin-bottom: 8px; opacity: 0.9;">扫描二维码访问个人可视化简历</p>
+    <div class="qr-container" id="posterQr"></div>
+    <p class="poster-hint">海报设计：高天乐 · 数据科学与大数据技术 · 浙江树人学院</p>
+  </div>
+
+</div>
+
+<div class="footer">
+  © 2025 高天乐 | 数据科学与大数据技术 | 数据可视化课程期末作业
+</div>
+
+<!-- ===== CHARTS INITIALIZATION ===== -->
+<script>
+(function() {
+  // ---- Color Palette ----
+  const colors = ['#667eea','#764ba2','#f093fb','#4facfe','#43e97b','#f5a623','#f55b47','#50c878'];
+
+  // ===== 1. 技能雷达图 =====
+  const radarDom = document.getElementById('radarChart');
+  const radarChart = echarts.init(radarDom);
+  radarChart.setOption({
+    tooltip: { trigger: 'item' },
+    legend: {
+      bottom: 0,
+      textStyle: { color: '#666', fontSize: 12 }
+    },
+    radar: {
+      center: ['50%', '48%'],
+      radius: '72%',
+      indicator: [
+        { name: 'Python', max: 100 },
+        { name: 'SQL', max: 100 },
+        { name: '机器学习', max: 100 },
+        { name: '数据可视化', max: 100 },
+        { name: '大数据处理', max: 100 },
+        { name: '后端开发', max: 100 }
+      ],
+      axisName: { color: '#555', fontSize: 11, borderRadius: 3 }
+    },
+    series: [{
+      type: 'radar',
+      name: '技能水平',
+      data: [{ value: [90, 85, 75, 88, 70, 65], name: '当前水平' }],
+      areaStyle: { color: 'rgba(102,126,234,0.25)' },
+      lineStyle: { color: '#667eea', width: 2 },
+      itemStyle: { color: '#667eea', borderColor: '#fff', borderWidth: 2 },
+      symbol: 'circle', symbolSize: 8
+    }]
+  });
+
+  // ===== 2. 项目数据看板（柱状图+折线） =====
+  const projDom = document.getElementById('projectChart');
+  const projChart = echarts.init(projDom);
+  projChart.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: {
+      data: ['数据处理量(万条)', '模型准确率(%)'],
+      bottom: 0,
+      textStyle: { fontSize: 11 }
+    },
+    grid: { left: '3%', right: '5%', bottom: '15%', top: '8%', containLabel: true },
+    xAxis: {
+      type: 'category',
+      data: ['数据清洗', '特征工程', 'RFM建模', '用户分群', '画像生成', '看板部署'],
+      axisLabel: { fontSize: 10, rotate: 15 }
+    },
+    yAxis: [
+      {
+        type: 'value', name: '数据量(万条)',
+        axisLabel: { fontSize: 10 },
+        splitLine: { lineStyle: { type: 'dashed', color: '#eee' } }
+      },
+      {
+        type: 'value', name: '准确率(%)', max: 100,
+        axisLabel: { fontSize: 10 }
+      }
+    ],
+    series: [
+      {
+        name: '数据处理量(万条)', type: 'bar',
+        data: [120, 95, 60, 85, 40, 30],
+        itemStyle: {
+          borderRadius: [6,6,0,0],
+          color: new echarts.graphic.LinearGradient(0,0,0,1,[
+            {offset:0, color:'#667eea'},{offset:1, color:'#a0aef0'}
+          ])
+        },
+        barWidth: '50%'
+      },
+      {
+        name: '模型准确率(%)', type: 'line', yAxisIndex: 1,
+        data: [99, 98, 96, 94, 95, 97],
+        lineStyle: { color: '#f5a623', width: 3 },
+        itemStyle: { color: '#f5a623' },
+        symbol: 'circle', symbolSize: 8
+      }
+    ]
+  });
+
+  // ===== 3. 课程成绩分布 =====
+  const courseDom = document.getElementById('courseChart');
+  const courseChart = echarts.init(courseDom);
+  courseChart.setOption({
+    tooltip: { trigger: 'item', formatter: '{b}: {c} 分 ({d}%)' },
+    series: [{
+      type: 'pie',
+      radius: ['50%', '78%'],
+      center: ['50%', '50%'],
+      avoidLabelOverlap: false,
+      itemStyle: {
+        borderRadius: 8,
+        borderColor: '#fff',
+        borderWidth: 3
+      },
+      label: {
+        show: true,
+        position: 'outside',
+        formatter: '{b}\n{d}%',
+        fontSize: 10
+      },
+      emphasis: {
+        label: { fontSize: 14, fontWeight: 'bold' },
+        scaleSize: 12
+      },
+      data: [
+        { value: 92, name: 'Python程序设计' },
+        { value: 88, name: '数据可视化' },
+        { value: 85, name: '数据库原理' },
+        { value: 82, name: '数据挖掘' },
+        { value: 80, name: '机器学习' },
+        { value: 78, name: '大数据处理' },
+        { value: 90, name: '统计学' }
+      ],
+      color: colors
+    }]
+  });
+
+  // ===== 4. 技能词云 =====
+  const wcDom = document.getElementById('wordcloudChart');
+  const wcChart = echarts.init(wcDom);
+  const keywords = [
+    { name: 'Python', value: 100 },
+    { name: '数据分析', value: 95 },
+    { name: 'SQL', value: 88 },
+    { name: '数据可视化', value: 85 },
+    { name: '机器学习', value: 78 },
+    { name: 'Tableau', value: 72 },
+    { name: 'Pandas', value: 90 },
+    { name: 'NumPy', value: 82 },
+    { name: 'Spark', value: 65 },
+    { name: 'Hadoop', value: 60 },
+    { name: 'ECharts', value: 80 },
+    { name: 'Scikit-learn', value: 75 },
+    { name: 'RFM模型', value: 68 },
+    { name: '数据挖掘', value: 72 },
+    { name: '用户画像', value: 66 },
+    { name: 'MySQL', value: 70 },
+    { name: 'PostgreSQL', value: 55 },
+    { name: '特征工程', value: 62 },
+    { name: '统计学', value: 74 },
+    { name: '数据清洗', value: 68 },
+    { name: 'Spring Boot', value: 45 },
+    { name: 'Java', value: 50 },
+    { name: 'Git', value: 58 },
+    { name: 'Linux', value: 48 },
+    { name: 'Excel', value: 55 }
+  ];
+  wcChart.setOption({
+    tooltip: { show: true },
+    series: [{
+      type: 'wordCloud',
+      shape: 'circle',
+      left: 'center',
+      top: 'center',
+      width: '90%',
+      height: '90%',
+      rotationRange: [-45, 45],
+      rotationStep: 15,
+      gridSize: 8,
+      sizeRange: [14, 48],
+      textStyle: {
+        fontFamily: 'PingFang SC, Microsoft YaHei, sans-serif',
+        fontWeight: 'bold',
+        color: function() {
+          const cs = ['#667eea','#764ba2','#4facfe','#f093fb','#43e97b','#f5a623','#f55b47','#50c878'];
+          return cs[Math.floor(Math.random() * cs.length)];
+        }
+      },
+      emphasis: {
+        textStyle: { fontSize: 48 }
+      },
+      data: keywords
+    }]
+  });
+
+  // ===== 5. QR Code Generation =====
+  const pageUrl = window.location.href;
+  // Hero mini QR
+  new QRCode(document.getElementById('heroQr'), {
+    text: pageUrl,
+    width: 38,
+    height: 38,
+    colorDark: '#1a1a2e',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+  // Poster QR
+  new QRCode(document.getElementById('posterQr'), {
+    text: pageUrl,
+    width: 200,
+    height: 200,
+    colorDark: '#1a1a2e',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  // ===== Responsive Resize =====
+  window.addEventListener('resize', function() {
+    radarChart.resize();
+    projChart.resize();
+    courseChart.resize();
+    wcChart.resize();
+  });
+})();
+</script>
+
+</body>
+</html>
