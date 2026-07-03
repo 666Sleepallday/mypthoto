@@ -391,7 +391,9 @@
       📱 个人二维码海报
     </h3>
     <p style="margin-bottom: 8px; opacity: 0.9;">扫描二维码访问个人可视化简历</p>
-    <div class="qr-container" id="posterQr"></div>
+    <div class="qr-container" id="posterQr">
+        <img src="页面二维码_index2.png" alt="个人二维码" style="width:200px;height:200px;display:block;">
+      </div>
     <p class="poster-hint">海报设计：高天乐 · 数据科学与大数据技术 · 浙江树人学院</p>
   </div>
 
@@ -585,18 +587,9 @@
     }]
   });
 
-  // ===== 5. QR Code Generation =====
-  const pageUrl = window.location.href;
-  // Hero mini QR — replaced with static image: 页面二维码_index2.png
-  // Poster QR
-  new QRCode(document.getElementById('posterQr'), {
-    text: pageUrl,
-    width: 200,
-    height: 200,
-    colorDark: '#1a1a2e',
-    colorLight: '#ffffff',
-    correctLevel: QRCode.CorrectLevel.H
-  });
+  // ===== 5. QR Code — 使用静态图片 简历二维码.png =====
+  // Hero 小二维码: 已替换为简历二维码.png (头像右上角)
+  // Poster 大二维码: 已替换为简历二维码.png (页面底部)
 
   // ===== Responsive Resize =====
   window.addEventListener('resize', function() {
@@ -610,3 +603,4 @@
 
 </body>
 </html>
+
